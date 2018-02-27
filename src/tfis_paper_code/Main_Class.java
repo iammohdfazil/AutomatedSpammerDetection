@@ -7,7 +7,7 @@ public class Main_Class {
 	public static void main(String []args) throws IOException, InterruptedException{
 		
 		//File organizations
-		
+		//System.out.println("Hello");
 		//All the files should be in csv format
 		//tweets file should be organized as-- userid, tweets, tweet-time, tweet-type(web-based or API) 
 		//followers file should be organized as-- userid, follower1, follower1,------follower2
