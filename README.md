@@ -1,6 +1,6 @@
 # Automated Spammer Detection
 
-### All the files should be in csv format
+### All the below files should be in csv format
 
 tweets file should be organized as-- userid, tweets, tweet-time, tweet-type (Web-based or API)
 
