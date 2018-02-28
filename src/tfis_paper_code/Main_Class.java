@@ -36,7 +36,7 @@ public class Main_Class {
 		Interaction_Category.reputation_and_followerRatio();
 		//Execute this method to compute clustering coefficient
 		Interaction_Category.clus_coefficient();
-		//Execute the below four methods in sequence to compute follower-based reputation
+		//Execute the below two methods in sequence to compute follower-based reputation
 		Interaction_Category.Friends_Fol_And_Neighbors_Flng_Extraction();
 		Interaction_Category.followerBasedReputation();
 		//Execute this method to compute mean followers following to follower ratio
@@ -44,8 +44,8 @@ public class Main_Class {
 		
 		//Community-Based Features
 		
-		//Execute the below four methods in sequence to compute community-based users' reputation
-		//After this, find the communities of every users using the CONCLUDE algorithm
+		//Execute the below three methods in sequence to compute community-based users' reputation
+		//After executing followersFolllowersAndFollowings(), pass its output to CONCLUDE algorithm to find the communities of every user
 		Community_Category.followersFolllowersAndFollowings();
 		Community_Category.communityUsersReputation();
 		Community_Category.communityBasedUsersReputation();*/
