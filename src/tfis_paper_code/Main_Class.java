@@ -6,12 +6,7 @@ public class Main_Class {
 
 	public static void main(String []args) throws IOException, InterruptedException{
 		
-		//File organizations
-		System.out.println("Hello");
-		//All the files should be in csv format
-		//tweets file should be organized as-- userid, tweets, tweet-time, tweet-type(web-based or API) 
-		//followers file should be organized as-- userid, follower1, follower1,------follower2
-		//followings file should be organized as-- userid, following1, following1,------following2
+		//Execute the method whichever feature values are required
 		
 		//Metadata-Based Features
 		
@@ -29,7 +24,7 @@ public class Main_Class {
 		//Content-Based Features
 		
 		//Execute this method to compute the UR, UUR, MR, UMR, HTR features
-		Content_Category.UR_MR_UUR_UMR_HTR();
+		//Content_Category.UR_MR_UUR_UMR_HTR();
 		//Execute this method to calculate the similarity between the hashtag and tweets of users
 		/*Content_Category.tweetHashtagSimilarityRatio();
 		//Execute this method to compute the AUR and ATS features
