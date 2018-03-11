@@ -125,18 +125,15 @@ public class Interaction_Category
 		}
 		br.close();	br1.close();
 		
-		//List objects to hold friends and followers of the users
-		List<Integer> friend_list=new ArrayList<Integer>();
-		List<Integer> follower_list=new ArrayList<Integer>();
-		
 		//Id set pof the users to whom reputation and follower ration has to be calculated
 		Set<Integer> userid_set=user_and_followers_id.keySet();
 		
 		//Loop to find followers and followings corresponding to every user their intersection and union
 		for(Integer userid:userid_list)
 		{
-			follower_list=user_and_followers_id.get(userid);
-			friend_list=user_and_followings_id.get(userid);
+			//List objects to hold friends and followers of the user
+			List<Integer> follower_list=user_and_followers_id.get(userid);
+			List<Integer> friend_list=user_and_followings_id.get(userid);
 			
 			if(userid_set.contains(userid))
 			{
@@ -234,11 +231,6 @@ public class Interaction_Category
 		ArrayListMultimap<Integer,Integer> friends_fol = ArrayListMultimap.create();
 		ArrayListMultimap<Integer,Integer> neighbors_flng = ArrayListMultimap.create();
 		
-		List<Integer> neighbor_list=new ArrayList<Integer>();
-		List<Integer> neighbor_list1=new ArrayList<Integer>();
-		List<Integer> neighbors_fol_set=new ArrayList<Integer>();
-		List<Integer> neighbors_flng_set=new ArrayList<Integer>();
-		
 		List<Integer> userid_list=new ArrayList<Integer>();
 		
 		String [] neighbor_tokens,friends_tokens;
@@ -305,11 +297,11 @@ public class Interaction_Category
 		for(Integer userid:userid_list)
 		{
 			int edges=0;
-			
 			//Find the neighbors corresponding to each user
-			neighbor_list=userid_and_fols.get(userid);
-			neighbor_list1=userid_and_fols.get(userid);
-			friend_list=userid_and_flng.get(userid);
+			List<Integer> neighbor_list=userid_and_fols.get(userid);
+			List<Integer> neighbor_list1=userid_and_fols.get(userid);
+			List<Integer> friend_list=userid_and_flng.get(userid);
+			
 			//Map object to hold the already traversed edges among neighbors of a user
 			TreeMap<Integer,Integer> added_edges=new TreeMap<Integer,Integer>();
 			Set<Integer> connectednodes=new HashSet<Integer>(neighbor_list);
@@ -326,45 +318,45 @@ public class Interaction_Category
 				for(Integer cnode: connectednodes)
 				{		
 					//Extract the friends of the connecting node of a user
-					cnode_flng_set=neighbors_flng.get(cnode);
+					List<Integer> cnode_flng_set=neighbors_flng.get(cnode);
 					
-						//Loop corresponding to every friend
-						for(Integer cnode_flng_id: cnode_flng_set)
-						{	
-							//Checks if connecting node friend is also a connecting user of the user and finds the edges among the connecting users
+					//Loop corresponding to every friend
+					for(Integer cnode_flng_id: cnode_flng_set)
+					{	
+						//Checks if connecting node friend is also a connecting user of the user and finds the edges among the connecting users
+						for(Integer cnode1: connectednodes)
+						{
+							//Checks the neighbor's friends ids with other neighbors and whether edge has already been traversed or not?
+							if(cnode1.equals(cnode_flng_id)&&(!((added_edges.containsKey(cnode)&&added_edges.containsValue(cnode_flng_id))||(added_edges.containsKey(cnode_flng_id)&&added_edges.containsKey(cnode)))))
+							{
+								//Adds the edges into traversed list
+								added_edges.put(cnode, cnode_flng_id);
+								added_edges.put(cnode_flng_id, cnode);
+								edges++;
+							}
+						}		
+					}
+						
+					//Test whether neighbor's follower list is available or not
+					if(Collections.binarySearch(friends_id_list, cnode)>=0)
+					{
+						//Extracts the neighbor's followers
+						List<Integer> cnode_fol_set=friends_fol.get(folid);
+
+						//Traverse every neighbor's follower
+						for(Integer cnode_fol_id: cnode_fol_set)
+						{
 							for(Integer cnode1: connectednodes)
 							{
-								//Checks the neighbor's friends ids with other neighbors and whether edge has already been traversed or not?
-								if(cnode1.equals(cnode_flng_id)&&(!((added_edges.containsKey(cnode)&&added_edges.containsValue(cnode_flng_id))||(added_edges.containsKey(cnode_flng_id)&&added_edges.containsKey(cnode)))))
+								if(cnode1==cnode_fol_id&&!(added_edges.containsKey(cnode1)&&added_edges.containsValue(cnode_fol_id)))
 								{
-									//Adds the edges into traversed list
-									added_edges.put(cnode, cnode_flng_id);
-									added_edges.put(cnode_flng_id, cnode);
+									added_edges.put(cnode_fol_id, cnode1);
+									added_edges.put(cnode1, cnode_fol_id);
 									edges++;
-								}
-							}		
-						}
-						
-						//Test whether neighbor's follower list is available or not
-						if(Collections.binarySearch(friends_id_list, cnode)>=0)
-						{
-							//Extracts the neighbor's followers
-							cnode_fol_set=friends_fol.get(folid);
-							
-							//Traverse every neighbor's follower
-							for(Integer cnode_fol_id: cnode_fol_set)
-							{
-								for(Integer cnode1: connectednodes)
-								{
-									if(cnode1==cnode_fol_id&&!(added_edges.containsKey(cnode1)&&added_edges.containsValue(cnode_fol_id)))
-									{
-										added_edges.put(cnode_fol_id, cnode1);
-										added_edges.put(cnode1, cnode_fol_id);
-										edges++;
-									}	
 								}	
-							}
+							}	
 						}
+					}
 				}
 				
 				//Compute the clustering coefficient
