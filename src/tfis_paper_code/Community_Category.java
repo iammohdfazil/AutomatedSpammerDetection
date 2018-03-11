@@ -69,10 +69,10 @@ public class Community_Category {
 		{	
 			try
 			{
-				//Provide the path of file that has the users' followers
-				System.out.println("Enter the path of the file that has users' followers in csv format");
-				String users_followers_file1=inputfile.nextLine();
-				br2=new BufferedReader(new FileReader(users_followers_file1));
+				//Provide the path of file that has users' id
+				System.out.println("Enter the path of the file that has users ids in csv format");
+				String uid_file=inputfile.nextLine();
+				br2=new BufferedReader(new FileReader(uid_file));
 				break;
 			}
 			catch(FileNotFoundException fe)
@@ -118,7 +118,6 @@ public class Community_Category {
 		
 		while((followers=br.readLine())!=null)
 		{
-			
 			followers_tokens=followers.split(",");
 			if(followers_tokens.length==2)
 				continue;
@@ -173,8 +172,10 @@ public class Community_Category {
 		}
 		
 		int u=1, followers_size;
-		while((followers1=br2.readLine())!=null)
-		{			
+		while((user=br2.readLine())!=null)
+		{	
+			int uid=Integer.parseInt(user.trim());
+			Set<String> connectedusers=new HashSet<String>();
 			followers_tokens1=followers1.split(",");
 			followers_size=followers_tokens1.length-1;
 			
@@ -184,7 +185,7 @@ public class Community_Category {
 			{	
 				try
 				{
-					System.out.println("Enter the path of the directory to save the connections amonf the connecting nodes of users in csv format");
+					System.out.println("Enter the path of the directory to save the connections among the connecting nodes of users in csv format");
 					String connections_file=inputfile.nextLine();
 					pw2=new BufferedWriter(new FileWriter(connections_file+u+++".txt",true));
 					break;
@@ -194,33 +195,39 @@ public class Community_Category {
 					System.out.println("Please enter a valid file path");
 					continue;
 				}
-			}	
+			}
+			
+			connectedusers.addAll(userid_and_fols.get(uid));
+			connectedusers.addAll(userid_and_flngs.get(uid));
+			connectedusers.addAll(friendsid_and_fols.get(uid));
+			connectedusers.addAll(followerid_and_flng.get(uid));
 			
 			if(followers_size!=0)							
 			{
-				for(int j=1;j<followers_size;j++)
+				for(String cuid: connectedusers)
 				{
-					pw2.write(Long.parseLong(followers_tokens1[j].trim())+"	"+Long.parseLong(followers_tokens1[0].trim())+"\n");
-				}
-				for(int i=1;i<followers_size;i++)
-				{
-					if(!(followers_tokens1[i].trim().isEmpty()))		//checks if neighbor id is empty or not
+					//Condition for finding followers' following
+					//Binary search operation on users' neighbor list to find the neighbor
+					if(Collections.binarySearch(followerid_list, cuid)>=0)	
 					{
-						int follower_id=Integer.parseInt(followers_tokens1[i].trim());
-						
-						//Condition for finding followers' following
-						//Binary search operation on users' neighbor list to find the neighbor
-						if(Collections.binarySearch(followerid_list, follower_id)>=0)	
+						for(int k=0;k<followerid_and_flng.get(cuid).size();k++)
 						{
-							for(int k=0;k<followerid_and_flng.get(follower_id).size();k++)
-								pw2.write(followerid_and_flng.get(follower_id).get(k)+"	"+follower_id+"\n");												
+							//Condition to avoid edges from user, for whom communities are extracted, to the connected node 
+							if(followerid_and_flng.get(cuid).get(k).equals(uid))
+								continue;
+							pw2.write(followerid_and_flng.get(cuid).get(k)+"	"+cuid+"\n");
 						}
-						
-						//Condition to find followers of the followers
-						if(Collections.binarySearch(friendsid_list, follower_id)>=0)	//Binary search operation on user's following list to find the neighbors and correspondingly neighbor followers
+					}
+					
+					//Condition to find followers of the followers
+					if(Collections.binarySearch(friendsid_list, cuid)>=0)	//Binary search operation on user's following list to find the neighbors and correspondingly neighbor followers
+					{
+						for(int k=0;k<friendsid_and_fols.get(cuid).size();k++)
 						{
-							for(int k=0;k<friendsid_and_fols.get(follower_id).size();k++)
-								pw2.write(friendsid_and_fols.get(follower_id).get(k)+"	"+follower_id+"\n");												
+							//Condition to avoid edges from the node to the user for whom communities are extracted
+							if(friendsid_and_fols.get(cuid).get(k).equals(uid))
+								continue;
+							pw2.write(cuid+"	"+friendsid_and_fols.get(cuid).get(k)+"\n");
 						}
 					}
 				}
@@ -506,8 +513,8 @@ public class Community_Category {
 	public static void communityBasedClusteringCoefficient() throws IOException,InterruptedException
 	{
 		//Multimap for mapping followings and followers corresponding to every user id
-		ArrayListMultimap<Integer,Integer> friend_and_fols=ArrayListMultimap.create();
-		ArrayListMultimap<Integer,Integer> follower_and_their_followings=ArrayListMultimap.create();
+		ArrayListMultimap<Integer, Integer> friend_and_fols=ArrayListMultimap.create();
+		ArrayListMultimap<Integer, Integer> follower_and_their_followings=ArrayListMultimap.create();
 		
 		Scanner inputfile=new Scanner(System.in);
 		BufferedReader br, br1, br2, br3;
@@ -517,7 +524,6 @@ public class Community_Category {
 		{
 			try
 			{
-		
 				//provide the path of the files that have neighbor_flngs and friend_fols without brackets
 				System.out.println("Enter the path of the file that has neighbors' follwoings in csv format");
 				String neighbors_followings_file=inputfile.nextLine();
@@ -612,7 +618,6 @@ public class Community_Category {
 		int i=1;
 		while((userid=br2.readLine())!=null)
 		{
-			userid_token=userid.split(",");
 			LineNumberReader ln;
 			while(true)
 			{
@@ -637,8 +642,8 @@ public class Community_Category {
 			if(ln.getLineNumber()==1||ln.getLineNumber()==0)
 			{
 				System.out.println("file has only one line \n+ File Name:	"+"outuser"+i+".txt"+"		"+ln.getLineNumber());
-				System.out.println(userid_token[0]+"	"+0.0);
-				pw.write(userid_token[0]+","+0.0+"\n");
+				System.out.println(userid+"	"+0.0);
+				pw.write(userid+","+0.0+"\n");
 				i++;
 				continue;
 			}
@@ -661,66 +666,73 @@ public class Community_Category {
 				}	
 				double u_ccoef=0.0;
 				
+				TreeMap<String, String> added_edges=new TreeMap<String, String>();
+
 				//Reads the communities line by line as every community is represented in one line
 				while((comm_users=br3.readLine())!=null)
 				{
+					int edges=0;
 					if(comm_users.contains("Q"))
 						continue;
 					else
 					{
-						int t_edges=0;
-						int edge=0,edge1=0;
 						double c_coef=0.0;
-						
+						Set<String> cusers_list=new HashSet<String>();
 						//Breaks the communities into their users separated by comma or tab
 						comm_user_tokens=comm_users.split("[\\t,\\,]");
 						
-						Set<Integer> users=new HashSet<Integer>();
 						for(int k=0;k<comm_user_tokens.length;k++)
-							users.add(Integer.parseInt(comm_user_tokens[k]));
-						int c_len=comm_user_tokens.length;
-						
-						if(users.contains(Integer.parseInt(userid_token[0].trim())))
-						{
-							for(int j=0;j<comm_user_tokens.length;j++)
-							{	
-								Integer id=Integer.parseInt(comm_user_tokens[j].trim());
-				
-								//Searching of the community nodes in  user id list so that if found, can search their edges going from or coming to that node that their followers or followings
-								if(Collections.binarySearch(friend_id_list, id)>=0)
+							cusers_list.add(comm_user_tokens[k].trim());
+					
+						for(String cuser: cusers_list)
+						{						
+							//Extraction of friends of the community users
+							cuser_flng_list=follower_and_their_followings.get(cuser);
+							Set<String> cuser_flng_set=new HashSet<String>(cuser_flng_list);
+							
+							for(String cuser_flng_id: cuser_flng_set)
+							{
+								if(cuser.trim().equals(cuser_flng_id.trim())&&(!((added_edges.containsKey(cuser)&&added_edges.containsValue(cuser_flng_id))||(added_edges.containsKey(cuser_flng_id)&&added_edges.containsKey(cuser)))))
 								{
-									for(int k=j+1;k<comm_user_tokens.length;k++)
-										if(friend_and_fols.get(id).contains(Integer.parseInt(comm_user_tokens[k].trim())))
-										{
-											System.out.println(comm_user_tokens[j]+"	"+Integer.parseInt(comm_user_tokens[k].trim()));
-											edge++;
-										}
-								}
-								
-								if(Collections.binarySearch(follower_id_list, id)>=0)
-								{
-									for(int k=j+1;k<comm_user_tokens.length;k++)
-										if(follower_and_their_followings.get(id).contains(Integer.parseInt(comm_user_tokens[k].trim())))
-										{
-											System.out.println(comm_user_tokens[j]+"	"+Integer.parseInt(comm_user_tokens[k].trim()));
-											edge1++;
-										}
+									//Adds the edges into traversed list
+									added_edges.put(cuser, cuser_flng_id);
+									added_edges.put(cuser_flng_id, cuser);
+									edges++;
 								}
 							}
-							t_edges=edge+edge1;
 							
-							//This is for the case one there is no link among the community members of the node if not checked it gives NaN
-							if(t_edges==0)
-									c_coef=0.0;
-							else
-								 	c_coef=(double)t_edges/(c_len*(c_len-1)); //Clustering coefficient of a single community of a user
-							u_ccoef=u_ccoef+c_coef;
-							System.out.println(u_ccoef);
-						}	
+							if(Collections.binarySearch(friend_id_list, cuser)>=0)
+							{
+								//Extracts the neighbor's followers
+								cuser_fol_list=friend_and_fols.get(cuser);
+								Set<String> cuser_fol_set=new HashSet<String>(cuser_fol_list);
+								
+								for(String cuser_fol_id: cuser_fol_set)
+								{
+									for(String cuser1: cusers_list)
+									{
+										if(cuser1.trim().equals(cuser_fol_id.trim())&&(!((added_edges.containsKey(cuser1)&&added_edges.containsValue(cuser_fol_id))||(added_edges.containsKey(cuser_fol_id)&&added_edges.containsKey(cuser1)))))
+										{	added_edges.put(cuser1, cuser_fol_id);
+											added_edges.put(cuser_fol_id, cuser);
+											edges++;
+										}
+									}
+								}
+							}
+						}
+			
+						//This is for the case one there is no link among the community members of the node if not checked it gives NaN
+						if(edges==0||comm_user_tokens.length==1)
+								c_coef=0.0;
+						else
+							 	c_coef=(double)edges/(comm_user_tokens.length*(comm_user_tokens.length-1)); //Clustering coefficient of a single community of a user
+						
+						u_ccoef=u_ccoef+c_coef;
+						System.out.println(u_ccoef+"==="+edges+"==="+comm_user_tokens.length);
 					}					
 				}
-				System.out.println(userid_token[0]+"	user coefficient is:	"+(double)u_ccoef/(ln.getLineNumber()-1)+"\n============");
-				pw.write(userid_token[0]+","+(double)u_ccoef/(ln.getLineNumber()-1)+"\n");		//Clustering coefficient of a user averaged over all the communities formed by its neighbors
+				System.out.println(userid+"	user coefficient is:	"+(double)u_ccoef/(ln.getLineNumber()-1)+"\n============");
+				pw.write(userid+","+(double)u_ccoef/(ln.getLineNumber()-1)+"\n");		//Clustering coefficient of a user averaged over all the communities formed by its neighbors
 				br3.close();
 			}
 			ln.close();
