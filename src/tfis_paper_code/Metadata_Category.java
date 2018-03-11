@@ -29,7 +29,7 @@ import com.google.common.math.LongMath;
 public class Metadata_Category {
 	
 	public static void retweetRatio() throws IOException,InterruptedException
-    {
+    	{
 		//Provide the path of the file having the user-id
 		Scanner inputfile = new Scanner(System.in);
 		BufferedReader br, br1;
@@ -72,7 +72,7 @@ public class Metadata_Category {
 		//Loop to calculate retweet count for every user using their user-id
 		while((userid=br.readLine())!=null)
 		{
-			int retweetcount=0,tweetcount=0;
+			int retweetcount=0, tweetcount=0;
 			useridtokens=userid.split(",");
 			
 			while(true)
@@ -92,7 +92,7 @@ public class Metadata_Category {
 				}
 			}
 			
-			//Loop to the reply status of a tweet
+			//Loop to check the retweet status of tweets
 			int i=1;
 			while((tweet=br1.readLine())!=null)
 			{
@@ -115,10 +115,10 @@ public class Metadata_Category {
 			System.out.println("Retweet count for user  "+useridtokens[0]+"	is:	"+retweetcount+"	Tweet count is:	"+tweetcount+"	and Retweet ratio is:	"+((float)retweetcount/tweetcount));
 		}
 		inputfile.close(); pw.close();br.close();
-    }
+    	}
 
 	public static void automatedTweetRatio() throws IOException,InterruptedException
-    {
+    	{
 		Scanner inputfile = new Scanner(System.in);
 		BufferedReader br, br1;
 		PrintWriter pw;
@@ -127,10 +127,9 @@ public class Metadata_Category {
 		{	
 			try
 			{
-				//Provide the path of the file that has users followers
-				System.out.println("Enter the path of the file that has users followers in csv format");
-				String users_followers_file=inputfile.nextLine();
-				br=new BufferedReader(new FileReader(users_followers_file));
+				System.out.println("Enter the path of the file that has users ids in csv format");
+				String uid_file=inputfile.nextLine();
+				br=new BufferedReader(new FileReader(uid_file));
 				break;
 			}
 			catch(FileNotFoundException fe)
@@ -191,7 +190,7 @@ public class Metadata_Category {
 				if(tweet_tokens[1].trim().isEmpty()==false&&(Integer.parseInt(tweet_tokens[1].trim())==Integer.parseInt(useridtokens[0].trim())))
 				{
 					noof_tweets++;
-					if(tweet_tokens[3].trim().equals("u'web'")==true)
+					if(tweet_tokens[3].trim().equals("web"))
 						continue;
 					else
 						noof_apitweets++;
@@ -202,11 +201,11 @@ public class Metadata_Category {
 			br1.close();
 	 	}
 	 	inputfile.close(); br.close();	pw.close();	
-    }
+   	}
 	
 	//Method to compute the tweets time standard deviation(TSD)
 	public static void tweetsTimeStandardDeviation() throws IOException,InterruptedException
-    {
+    	{
 		Scanner inputfile = new Scanner(System.in);
 		BufferedReader br, br1;
 		BufferedWriter pw;
@@ -216,7 +215,7 @@ public class Metadata_Category {
 			try
 			{
 				//Provide the path of the file having the users' tweets-time
-				System.out.println("Enter the path of the file that has users' tweets times in csv format");
+				System.out.println("Enter the path of the file that has users' tweets-timing in csv format");
 				String tweets_timefile=inputfile.nextLine();
 				br=new BufferedReader(new FileReader(tweets_timefile));
 				break;
@@ -259,11 +258,12 @@ public class Metadata_Category {
 				continue;
 			}
 		}
+		//Multimap to store the users ids and their tweets times
 		ArrayListMultimap<Integer,Long> userid_and_tweetstime=ArrayListMultimap.create();
 		String [] tweet_token, useridtokens;
-		String tweet,userid;
+		String tweet, userid;
 		
-		//Loop to carrying out to map account creation time for every user with user id using the user.csv file
+		//Loop to map users' id with their tweets time
 		while((tweet=br.readLine())!=null)
 		{
 			tweet_token=tweet.split(",");
@@ -338,7 +338,7 @@ public class Metadata_Category {
 	
 	//Method to compute the intermediate result to compute the tweets time interval standard deviation(TISD)
 	public static void tweetsTimeIntervalAndTheirAverage() throws IOException,InterruptedException
-    {
+    	{
 		Scanner inputfile = new Scanner(System.in);
 		BufferedReader br, br1;
 		BufferedWriter pw;
@@ -485,11 +485,11 @@ public class Metadata_Category {
 			}
 		}
 		inputfile.close(); br1.close(); pw.close();
-    }
+    	}
 	
-	//Method to compute the tweets time interval standard deviation(TISD)
+	//Method to compute the time interval standard deviation(TISD) of tweets
 	public static void tweetsTimeIntervalStandardDeviation() throws IOException,InterruptedException
-    {
+    	{
 		Scanner inputfile=new Scanner(System.in);
 		BufferedReader br;
 		BufferedWriter pw;
@@ -552,7 +552,6 @@ public class Metadata_Category {
 			
 			for(int i=1;i<(time_interval_tokens.length-3);i++)
 			{
-				
 				intra_time_interval_tokens=time_interval_tokens[i].split(":");
 				time_interval_sec=Integer.toString(Integer.parseInt(intra_time_interval_tokens[1])*30*24*60*60+Integer.parseInt(intra_time_interval_tokens[2])*24*60*60+Integer.parseInt(intra_time_interval_tokens[3])*60*60+Integer.parseInt(intra_time_interval_tokens[4])*60+Integer.parseInt(intra_time_interval_tokens[5]));
 				sum_inter_sec=sum_inter_sec+(Long.parseLong(time_interval_sec)*Long.parseLong(time_interval_sec));
