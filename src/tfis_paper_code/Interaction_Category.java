@@ -19,7 +19,7 @@ public class Interaction_Category
 {
 	//Method to calculate the reputation and follower ratio of users
 	public static void reputation_and_followerRatio() throws IOException,InterruptedException
-    {
+    	{
 		Scanner inputfile=new Scanner(System.in);
 		BufferedReader br, br1;
 		BufferedWriter pw, pw1;
@@ -125,10 +125,11 @@ public class Interaction_Category
 		}
 		br.close();	br1.close();
 		
-		//List objects to hold friends and followers
+		//List objects to hold friends and followers of the users
 		List<Integer> friend_list=new ArrayList<Integer>();
 		List<Integer> follower_list=new ArrayList<Integer>();
 		
+		//Id set pof the users to whom reputation and follower ration has to be calculated
 		Set<Integer> userid_set=user_and_followers_id.keySet();
 		
 		//Loop to find followers and followings corresponding to every user their intersection and union
@@ -172,7 +173,7 @@ public class Interaction_Category
 			}		
 		}	
 		inputfile.close(); pw.close();pw1.close();	
-    }
+    	}
 	
 	//Method to calculate the clustering coefficient
 	public static void clus_coefficient() throws IOException,FileNotFoundException,InterruptedException,NumberFormatException
@@ -264,8 +265,8 @@ public class Interaction_Category
 			{
 				 for(int i=1;i<friends_tokens.length;i++)
 				 {
-					 friends_fol.put(Integer.parseInt(friends_tokens[i].trim()),Integer.parseInt(friends_tokens[0].trim()));
-					 userid_and_flng.put(Integer.parseInt(friends_tokens[0].trim()),Integer.parseInt(friends_tokens[i].trim()));
+					 friends_fol.put(Integer.parseInt(friends_tokens[i].trim()), Integer.parseInt(friends_tokens[0].trim()));
+					 userid_and_flng.put(Integer.parseInt(friends_tokens[0].trim()), Integer.parseInt(friends_tokens[i].trim()));
 				 }					 
 			}
 		}
@@ -303,61 +304,62 @@ public class Interaction_Category
 		//Loop to calculate the clustering coefficient for every user
 		for(Integer userid:userid_list)
 		{
-			
 			int edges=0;
 			
-			//Map object to hold the already traversed edges among neighbors of a user
-			TreeMap<Integer,Integer> added_edges=new TreeMap<Integer,Integer>();
-			
-			//Finding neighbor corresponding to user
+			//Find the neighbors corresponding to each user
 			neighbor_list=userid_and_fols.get(userid);
 			neighbor_list1=userid_and_fols.get(userid);
+			friend_list=userid_and_flng.get(userid);
+			//Map object to hold the already traversed edges among neighbors of a user
+			TreeMap<Integer,Integer> added_edges=new TreeMap<Integer,Integer>();
+			Set<Integer> connectednodes=new HashSet<Integer>(neighbor_list);
+			connectednodes.addAll(friend_list)
 			
-			//If a user has no follower or neighbor
-			if(neighbor_list.size()<=1)
+			//If a user has only one or no connecting node
+			if(connectednodes.size()<=1)
 			{
 				pw.write(userid+","+0.0+"\n");
 			}
 			else
 			{
-				//Loop to find the edges among the neighbors of a user
-				for(Integer folid:neighbor_list )
+				//Loop to find the edges among the connecting nodes of a user
+				for(Integer cnode: connectednodes)
 				{		
-					//Extraction of friends of neighbor of user
-					neighbors_flng_set=neighbors_flng.get(folid);
+					//Extract the friends of the connecting node of a user
+					cnode_flng_set=neighbors_flng.get(cnode);
 					
-						//Loop corresponding to every neighbor's friend
-						for(Integer neighbor_flng_id:neighbors_flng_set)
+						//Loop corresponding to every friend
+						for(Integer cnode_flng_id: cnode_flng_set)
 						{	
-							//Checks if neighbor's friend is also neighbor of the user and finds the edges among neighbors of the user
-							for(Integer fol_id:neighbor_list1)
+							//Checks if connecting node friend is also a connecting user of the user and finds the edges among the connecting users
+							for(Integer cnode1: connectednodes)
 							{
 								//Checks the neighbor's friends ids with other neighbors and whether edge has already been traversed or not?
-								if(fol_id.equals(neighbor_flng_id)&&(!((added_edges.containsKey(folid)&&added_edges.containsValue(neighbor_flng_id))||(added_edges.containsKey(neighbor_flng_id)&&added_edges.containsKey(folid)))))
+								if(cnode1.equals(cnode_flng_id)&&(!((added_edges.containsKey(cnode)&&added_edges.containsValue(cnode_flng_id))||(added_edges.containsKey(cnode_flng_id)&&added_edges.containsKey(cnode)))))
 								{
 									//Adds the edges into traversed list
-									added_edges.put(folid,neighbor_flng_id);
-									added_edges.put(neighbor_flng_id, folid);
+									added_edges.put(cnode, cnode_flng_id);
+									added_edges.put(cnode_flng_id, cnode);
 									edges++;
 								}
 							}		
 						}
 						
 						//Test whether neighbor's follower list is available or not
-						if(Collections.binarySearch(friends_id_list, folid)>=0)
+						if(Collections.binarySearch(friends_id_list, cnode)>=0)
 						{
 							//Extracts the neighbor's followers
-							neighbors_fol_set=friends_fol.get(folid);
+							cnode_fol_set=friends_fol.get(folid);
 							
 							//Traverse every neighbor's follower
-							for(Integer neighbor_fol_id:neighbors_fol_set)
+							for(Integer cnode_fol_id: cnode_fol_set)
 							{
-								for(Integer fol_id:neighbor_list)
+								for(Integer cnode1: connectednodes)
 								{
-									if(fol_id==neighbor_fol_id&&!(added_edges.containsKey(fol_id)&&added_edges.containsValue(neighbor_fol_id)))
+									if(cnode1==cnode_fol_id&&!(added_edges.containsKey(cnode1)&&added_edges.containsValue(cnode_fol_id)))
 									{
-										added_edges.put(neighbor_fol_id,folid);
-										added_edges.put(folid, neighbor_fol_id);
+										added_edges.put(cnode_fol_id, cnode1);
+										added_edges.put(cnode1, cnode_fol_id);
 										edges++;
 									}	
 								}	
@@ -366,7 +368,7 @@ public class Interaction_Category
 				}
 				
 				//Compute the clustering coefficient
-				double clus_coeff=(double)edges/(neighbor_list.size()*(neighbor_list.size()-1));
+				double clus_coeff=(double)edges/(connectednodes.size()*(connectednodes.size()-1));
 				System.out.println(userid+"==="+clus_coeff+"==="+edges);
 				pw.write(userid+","+clus_coeff+"\n");
 			}
