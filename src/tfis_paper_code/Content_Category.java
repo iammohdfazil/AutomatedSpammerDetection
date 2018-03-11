@@ -25,15 +25,16 @@ import com.google.common.collect.SetMultimap;
 public class Content_Category {
 	//Method to compute the url ratio, unique url ratio, mention ratio, unique url ratio, and hash-tag ratio
 	public static void UR_MR_UUR_UMR_HTR() throws IOException,InterruptedException
-    {
+    	{
 		Scanner inputfile = new Scanner(System.in);
-		//Multimap object to map tweet, url, mention and hashtag list for every user id 
+		
+		//Multimap objects to map tweets, urls, mentions and hashtags for every user id 
 		ArrayListMultimap<Integer,String> userid_and_tweets = ArrayListMultimap.create();
 		ArrayListMultimap<Integer,String> userid_and_url = ArrayListMultimap.create();
 		ArrayListMultimap<Integer,String> userid_and_mention = ArrayListMultimap.create();
 		ArrayListMultimap<Integer,String> userid_and_hashtag = ArrayListMultimap.create();
 		
-		//Multimap set object map users and their unique url, mention and hashtag
+		//Multimap set object map users and their unique urls, mentions and hashtags
 		SetMultimap<Integer,String> userid_and_uniqueurl = HashMultimap.create();
 		SetMultimap<Integer,String> userid_and_uniquemention = HashMultimap.create();
 		SetMultimap<Integer,String> userid_and_uniquehashtag = HashMultimap.create();
@@ -91,11 +92,11 @@ public class Content_Category {
 	 	String [] userid_tweet_tokens, useridtokens;
 		String user_tweet, userid;
 		
-		//Loop to map tweets of every user
+		//Loop to map tweets of every user corresponding to their id
 	 	while((user_tweet=br.readLine())!=null)
 	 	{
 			userid_tweet_tokens=user_tweet.split(",");
-			userid_and_tweets.put(Integer.parseInt(userid_tweet_tokens[0].trim()),userid_tweet_tokens[1]);
+			userid_and_tweets.put(Integer.parseInt(userid_tweet_tokens[0].trim()), userid_tweet_tokens[1]);
 	 	}
 		br.close();
 		
@@ -164,11 +165,11 @@ public class Content_Category {
 			System.out.println(uid+","+((double)userid_and_url.get(uid).size()/userid_and_tweets.get(uid).size())+","+((double)userid_and_uniqueurl.get(uid).size()/userid_and_url.get(uid).size())+","+((double)userid_and_mention.get(uid).size()/userid_and_tweets.get(uid).size())+","+((double)userid_and_uniquemention.get(uid).size()/userid_and_mention.get(uid).size())+","+((double)userid_and_hashtag.get(uid).size()/userid_and_tweets.get(uid).size())+"\n");
 		}
 		inputfile.close(); br1.close(); pw.close();
-    }
+    	}
 	
 	//Method to compute the tweet and hash-tag similarity
 	public static void tweetHashtagSimilarityRatio() throws IOException,InterruptedException
-    {
+    	{
 		Scanner inputfile = new Scanner(System.in);
 		BufferedReader br, br1, br2;
 		PrintWriter pw, pw1;
@@ -224,7 +225,7 @@ public class Content_Category {
 			
 			//Loop equal to the number of hash-tags matched in tweets
 			while(hashtag_reg.find())
-    		{
+    			{
 				total_hashtag++;
 				String[] tweet_words=tweet_tokens[1].split(" ");
 				
@@ -237,7 +238,7 @@ public class Content_Category {
 					if(StringUtils.containsIgnoreCase(tweet_words[i].trim().replaceAll("[^\\w\\s]",""), hashtag))
 						matched_hashtag++;
 				}
-    		}
+    			}
 			// matched_hashtag is minus by 1 because hash-tag will always match itself
 			if(total_hashtag!=0)
 				pw.write(tweet_tokens[0]+","+tweet_tokens[1]+","+total_hashtag+","+(matched_hashtag-1)+"\n");
@@ -245,6 +246,7 @@ public class Content_Category {
 				pw.write(tweet_tokens[0]+","+tweet_tokens[1]+","+total_hashtag+","+matched_hashtag+"\n");
 		}
 		pw.close(); br.close();
+		
 		while(true)
 		{	
 			try
@@ -334,8 +336,9 @@ public class Content_Category {
 			pw1.write(uid+","+matched_htag_ratio+"\n");
 		}
 		inputfile.close(); pw1.close();
-    }
+    	}
 	
+	//Function to compute the automated tweets URL ratio and Automated tweets similarity
 	public static void AUR_ATS() throws IOException
 	{
 		Scanner inputfile=new Scanner(System.in);
@@ -436,7 +439,7 @@ public class Content_Category {
 				if(tweet_tokens[1].trim().isEmpty()==false&&(Integer.parseInt(tweet_tokens[0].trim())==uid))
 				{
 					noof_tweets++;
-					if(tweet_tokens[3].trim().equals("u'web'")==true)
+					if(tweet_tokens[3].trim().equals("web")==true)
 						webtweetcount++;
 					else
 					{
