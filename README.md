@@ -8,5 +8,5 @@ Followers file should be organized as-- userid, follower-1, follower-2,..., foll
 
 Followings file should be organized as-- userid, following-1, following-2,..., following-m
 
-If there is any error in code execution, feel free to mail us at mohdfazil.jmi@gmail.com or mfazil@ieee.org
+If there is any error in code execution, feel free to email at mohdfazil.jmi@gmail.com or mfazil@ieee.org
 		
